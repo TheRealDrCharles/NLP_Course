@@ -16,11 +16,11 @@ def similarity(word1, word2):
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-# sentences = word2vec.LineSentence('./Train_test_Set/train.txt')
-#
-# model = word2vec.Word2Vec(sentences, size=100, window=5, sg=1, hs=0, negative=5, iter=10)
-#
-# model.save('./my_model')
+sentences = word2vec.LineSentence('./Train_test_Set/train.txt')
+
+model = word2vec.Word2Vec(sentences, size=100, window=5, sg=1, hs=0, negative=5, iter=10)
+
+model.save('./my_model')
 model = word2vec.Word2Vec.load('./my_model')
 print(model)
 
@@ -46,6 +46,3 @@ for line in lines:
         print(str1, str2, 1)
 SAVE_PATH = os.path.join('sub.csv')
 df.to_csv(SAVE_PATH)
-
-
-
