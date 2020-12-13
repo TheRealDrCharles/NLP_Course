@@ -1,6 +1,7 @@
 from gensim.models import word2vec
 import logging
-
+import pandas as pd
+import os
 vector_size = 100
 def distance(word1, word2):
     distance = 0
@@ -15,11 +16,11 @@ def similarity(word1, word2):
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-sentences = word2vec.LineSentence('./Train_test_Set/train.txt')
-
-model = word2vec.Word2Vec(sentences, size=100, window=5, sg=1, hs=0, negative=5, iter=10)
-
-model.save('./my_model')
+# sentences = word2vec.LineSentence('./Train_test_Set/train.txt')
+#
+# model = word2vec.Word2Vec(sentences, size=100, window=5, sg=1, hs=0, negative=5, iter=10)
+#
+# model.save('./my_model')
 model = word2vec.Word2Vec.load('./my_model')
 print(model)
 
@@ -29,15 +30,22 @@ lines = f.readlines()
 mindis = float('inf')
 maxdis = float('-inf')
 
+df = pd.DataFrame(columns=())
+
 for line in lines:
     str = line.replace('\t',' ').replace('\n','')
     str1, str2 = str.split(" ")
     if str1 in worddic and str2 in worddic:
         maxdis = max(maxdis, distance(model.wv[str1], model.wv[str2]))
         mindis = min(mindis, distance(model.wv[str1], model.wv[str2]))
+        sim = similarity(str1, str2)
+        df = df.append(pd.DataFrame({'str1': [str1], 'str2': [str2], 'similarity': [sim]}), ignore_index=True)
         print(str1, str2, model.wv.similarity(str1, str2), similarity(str1, str2))
     else:
+        df = df.append(pd.DataFrame({'str1': [str1], 'str2': [str2], 'similarity': [1]}), ignore_index=True)
         print(str1, str2, 1)
+SAVE_PATH = os.path.join('sub.csv')
+df.to_csv(SAVE_PATH)
 
 
 
