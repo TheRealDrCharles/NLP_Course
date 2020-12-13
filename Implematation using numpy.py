@@ -6,20 +6,15 @@ import time
 import warnings
 import os
 import numpy as np
-
 from multiprocessing import Pool, Value, Array
-
 
 class VocabItem:
     def __init__(self, word):
         self.word = word
         self.count = 0
-        self.path = None  # Path (list of indices) from the root to the word (leaf)
-        self.code = None  # Huffman encoding
-
 
 class Vocab:
-    def __init__(self, fi, min_count):
+    def __init__(self, min_count):
         vocab_items = []
         vocab_hash = {}
         word_count = 0
@@ -255,7 +250,7 @@ def __init_process(*args):
 
 def train(fi, fo, cbow, neg, dim, alpha, win, min_count, num_processes, binary):
     # Read train file to init vocab
-    vocab = Vocab(fi, min_count)
+    vocab = Vocab(min_count)
 
     # Init net
     syn0, syn1 = init_net(dim, len(vocab))
@@ -267,11 +262,11 @@ def train(fi, fo, cbow, neg, dim, alpha, win, min_count, num_processes, binary):
     table = UnigramTable(vocab)
     # Begin training using num_processes workers
     t0 = time.time()
-    # pool = Pool(processes=num_processes, initializer=__init_process,
-    #             initargs=(vocab, syn0, syn1, table, cbow, neg, dim, alpha,
-    #                       win, num_processes, global_word_count, fi))
 
-    # pool.map(train_process, range(num_processes))
+    pool = Pool(processes=num_processes, initializer=__init_process,
+                initargs=(vocab, syn0, syn1, table, cbow, neg, dim, alpha,
+                          win, num_processes, global_word_count, fi))
+    pool.map(train_process, range(num_processes))
 
     t1 = time.time()
     print()
@@ -282,25 +277,7 @@ def train(fi, fo, cbow, neg, dim, alpha, win, min_count, num_processes, binary):
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('-train', help='Training file', dest='fi', required=True)
-    # parser.add_argument('-model', help='Output model file', dest='fo', required=True)
-    # parser.add_argument('-cbow', help='1 for CBOW, 0 for skip-gram', dest='cbow', default=0, type=int)
-    # parser.add_argument('-negative',
-    #                     help='Number of negative examples (>0) for negative sampling, 0 for hierarchical softmax',
-    #                     dest='neg', default=5, type=int)
-    # parser.add_argument('-dim', help='Dimensionality of word embeddings', dest='dim', default=100, type=int)
-    # parser.add_argument('-alpha', help='Starting alpha', dest='alpha', default=0.025, type=float)
-    # parser.add_argument('-window', help='Max window length', dest='win', default=5, type=int)
-    # parser.add_argument('-min-count', help='Min count for words used to learn <unk>', dest='min_count', default=5,
-    #                     type=int)
-    # parser.add_argument('-processes', help='Number of processes', dest='num_processes', default=1, type=int)
-    # parser.add_argument('-binary', help='1 for output model in binary format, 0 otherwise', dest='binary', default=0,
-    #                     type=int)
-    # # TO DO: parser.add_argument('-epoch', help='Number of training epochs', dest='epoch', default=1, type=int)
-    # args = parser.parse_args()
+
     TRAIN_FILE_PATH = os.path.join('.', 'Train_Test_Set', 'train.txt')
     MODEL_SAVE_PATH = os.path.join('my_model_implemention')
-    # train(args.fi, args.fo, bool(args.cbow), args.neg, args.dim, args.alpha, args.win,
-    #       args.min_count, args.num_processes, bool(args.binary))
-    train(TRAIN_FILE_PATH, MODEL_SAVE_PATH, 0, 5, 100, 0.025, 5, 5, 1, 0)
+    train(TRAIN_FILE_PATH, MODEL_SAVE_PATH, 0, 5, 100, 0.025, 5, 5, 4, 0)

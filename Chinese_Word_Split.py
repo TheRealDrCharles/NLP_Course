@@ -30,7 +30,10 @@ lines = f.readlines()
 mindis = float('inf')
 maxdis = float('-inf')
 
+FILE_PATH = os.path.join('subfile.txt')
 df = pd.DataFrame(columns=())
+
+file = open(FILE_PATH, 'w', encoding='utf8')
 
 for line in lines:
     str = line.replace('\t',' ').replace('\n','')
@@ -40,9 +43,11 @@ for line in lines:
         mindis = min(mindis, distance(model.wv[str1], model.wv[str2]))
         sim = similarity(str1, str2)
         df = df.append(pd.DataFrame({'str1': [str1], 'str2': [str2], 'similarity': [sim]}), ignore_index=True)
+        file.write('{0}\t{1}\t{2}\n'.format(str1, str2, sim))
         print(str1, str2, model.wv.similarity(str1, str2), similarity(str1, str2))
     else:
         df = df.append(pd.DataFrame({'str1': [str1], 'str2': [str2], 'similarity': [1]}), ignore_index=True)
+        file.write('{0}\t{1}\t{2}\n'.format(str1, str2, 1))
         print(str1, str2, 1)
 SAVE_PATH = os.path.join('sub.csv')
 df.to_csv(SAVE_PATH)
