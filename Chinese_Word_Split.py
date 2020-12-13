@@ -30,7 +30,7 @@ lines = f.readlines()
 mindis = float('inf')
 maxdis = float('-inf')
 
-FILE_PATH = os.path.join('subfile.txt')
+FILE_PATH = os.path.join('2020141075.txt')
 df = pd.DataFrame(columns=())
 
 file = open(FILE_PATH, 'w', encoding='utf8')
